@@ -13,11 +13,40 @@ const minioClient = new Client({
 
 const bucket = process.env.MINIO_BUCKET || 'photosphere-media';
 const publicBaseUrl = (process.env.STORAGE_PUBLIC_BASE_URL || `http://localhost:${port}/${bucket}`).replace(/\/$/, '');
+let bucketReady;
 
 const sanitizeFilename = (name) => name.replace(/[^a-zA-Z0-9._-]/g, '-');
 
+async function ensureBucket() {
+  if (!bucketReady) {
+    bucketReady = (async () => {
+      const exists = await minioClient.bucketExists(bucket);
+      if (!exists) {
+        await minioClient.makeBucket(bucket);
+      }
+
+      const policy = {
+        Version: '2012-10-17',
+        Statement: [
+          {
+            Effect: 'Allow',
+            Principal: { AWS: ['*'] },
+            Action: ['s3:GetObject'],
+            Resource: [`arn:aws:s3:::${bucket}/*`]
+          }
+        ]
+      };
+
+      await minioClient.setBucketPolicy(bucket, JSON.stringify(policy));
+    })();
+  }
+
+  return bucketReady;
+}
+
 async function uploadImage(file) {
   const objectName = `${Date.now()}-${sanitizeFilename(file.originalname)}`;
+  await ensureBucket();
   await minioClient.putObject(bucket, objectName, file.buffer, file.size, {
     'Content-Type': file.mimetype
   });
@@ -30,6 +59,7 @@ async function uploadImage(file) {
 module.exports = {
   minioClient,
   bucket,
+  ensureBucket,
   uploadImage,
   publicBaseUrl
 };
