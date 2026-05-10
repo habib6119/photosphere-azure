@@ -32,7 +32,7 @@ services:
       "
 
   api:
-    image: ${ACR_LOGIN_SERVER}/photosphere-backend:latest
+    image: photosphereacr18194344.azurecr.io/photosphere-backend:latest
     depends_on:
       - mongo
       - redis
@@ -58,13 +58,13 @@ services:
     restart: always
 
   frontend:
-    image: ${ACR_LOGIN_SERVER}/photosphere-frontend:latest
+    image: photosphereacr18194344.azurecr.io/photosphere-frontend:latest
     depends_on:
       - api
     restart: always
 
   gateway:
-    image: ${ACR_LOGIN_SERVER}/photosphere-gateway:latest
+    image: photosphereacr18194344.azurecr.io/photosphere-gateway:latest
     depends_on:
       - frontend
       - api
