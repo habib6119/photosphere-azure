@@ -37,11 +37,7 @@ export default function HomePage() {
           <h1>Cloud-style photo sharing demo</h1>
           <p>Creators upload photos with metadata. Consumers browse, search, comment, and rate posts.</p>
         </div>
-        <div className="card credentials-card">
-          <h3>Seeded demo accounts</h3>
-          <p><strong>Creator:</strong> creator@photosphere.local / password123</p>
-          <p><strong>Consumer:</strong> consumer@photosphere.local / password123</p>
-        </div>
+    
       </div>
 
       <form className="search-bar" onSubmit={handleSubmit}>
