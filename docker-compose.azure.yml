@@ -2,17 +2,17 @@ version: "3.8"
 
 services:
   mongo:
-    image: mongo:7
+    image: photosphereacr18194344.azurecr.io/mongo:7
     command: ["--bind_ip_all"]
     restart: always
 
   redis:
-    image: redis:7-alpine
+    image: photosphereacr18194344.azurecr.io/redis:7-alpine
     command: ["redis-server", "--appendonly", "yes"]
     restart: always
 
   minio:
-    image: minio/minio:latest
+    image: photosphereacr18194344.azurecr.io/minio:latest
     command: server /data --console-address 0.0.0.0:9001
     environment:
       MINIO_ROOT_USER: minioadmin
