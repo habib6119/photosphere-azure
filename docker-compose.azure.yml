@@ -1,0 +1,73 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo:7
+    command: ["--bind_ip_all"]
+    restart: always
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    restart: always
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    restart: always
+
+  minio-setup:
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 10 &&
+      mc alias set local http://minio:9000 minioadmin minioadmin123 &&
+      mc mb --ignore-existing local/photosphere-media &&
+      mc anonymous set download local/photosphere-media
+      "
+
+  api:
+    image: ${ACR_LOGIN_SERVER}/photosphere-backend:latest
+    depends_on:
+      - mongo
+      - redis
+      - minio
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      MONGO_URI: mongodb://mongo:27017/photosphere
+      JWT_SECRET: ${JWT_SECRET}
+      CLIENT_URL: ${CLIENT_URL}
+      REDIS_URL: redis://redis:6379
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_USE_SSL: "false"
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin123
+      MINIO_BUCKET: photosphere-media
+      STORAGE_PUBLIC_BASE_URL: ${CLIENT_URL}/media
+      SEED_CREATOR_EMAIL: creator@photosphere.local
+      SEED_CREATOR_PASSWORD: password123
+      SEED_CONSUMER_EMAIL: consumer@photosphere.local
+      SEED_CONSUMER_PASSWORD: password123
+    restart: always
+
+  frontend:
+    image: ${ACR_LOGIN_SERVER}/photosphere-frontend:latest
+    depends_on:
+      - api
+    restart: always
+
+  gateway:
+    image: ${ACR_LOGIN_SERVER}/photosphere-gateway:latest
+    depends_on:
+      - frontend
+      - api
+    ports:
+      - "80:80"
+    restart: always
