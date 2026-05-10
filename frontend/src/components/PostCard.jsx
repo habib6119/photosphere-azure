@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
+import { resolveImageUrl } from '../utils/imageUrl';
 
 export default function PostCard({ post }) {
   return (
     <article className="card post-card">
-      <img src={post.imageUrl} alt={post.title} className="post-image" />
+      <img src={resolveImageUrl(post.imageUrl)} alt={post.title} className="post-image" />
       <div className="card-body">
         <h3>{post.title}</h3>
         <p>{post.caption || 'No caption provided.'}</p>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { apiFetch } from '../api/client';
+import { resolveImageUrl } from '../utils/imageUrl';
 
 export default function CreatorPage() {
   const [form, setForm] = useState({ title: '', caption: '', location: '', peoplePresent: '' });
@@ -68,7 +69,7 @@ export default function CreatorPage() {
             {posts.length === 0 ? <p>No uploads yet.</p> : null}
             {posts.map((post) => (
               <div key={post._id} className="mini-post">
-                <img src={post.imageUrl} alt={post.title} />
+                <img src={resolveImageUrl(post.imageUrl)} alt={post.title} />
                 <div>
                   <strong>{post.title}</strong>
                   <p>{post.caption || 'No caption'}</p>

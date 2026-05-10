@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { apiFetch } from '../api/client';
 import { useAuth } from '../context/AuthContext';
+import { resolveImageUrl } from '../utils/imageUrl';
 
 export default function PostDetailsPage() {
   const { id } = useParams();
@@ -60,7 +61,7 @@ export default function PostDetailsPage() {
     <section className="page">
       <div className="details-layout">
         <div className="card">
-          <img src={post.imageUrl} alt={post.title} className="details-image" />
+          <img src={resolveImageUrl(post.imageUrl)} alt={post.title} className="details-image" />
         </div>
         <div className="card">
           <h2>{post.title}</h2>
